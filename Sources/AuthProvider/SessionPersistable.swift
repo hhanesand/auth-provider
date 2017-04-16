@@ -10,27 +10,20 @@ import Fluent
 public protocol SessionPersistable: Persistable {}
 
 private let sessionEntityId = "session-entity-id"
-private let sessionEntityType = "session-entity-type"
 
 /// MARK: Default conformance
 
 extension SessionPersistable where Self: Entity {
     public func persist(for req: Request) throws {
-        try req.session().data.set(sessionEntityType, "\(Self.self)")
-        try req.session().data.set(sessionEntityId, id)
+        try req.session().data.set(sessionEntityId + "-\(Self.self)", id)
     }
     
     public func unpersist(for req: Request) throws {
-        try req.session().data.set(sessionEntityType, nil)
-        try req.session().data.set(sessionEntityId, nil)
+        try req.session().data.set(sessionEntityId + "-\(Self.self)", nil)
     }
     
     public static func fetchPersisted(for request: Request) throws -> Self? {
-        guard let id = try request.session().data[sessionEntityId] else {
-            return nil
-        }
-        
-        guard let type = try request.session().data[sessionEntityType]?.string, type == "\(Self.self)" else {
+        guard let id = try request.session().data[sessionEntityId + "-\(Self.self)"] else {
             return nil
         }
         
