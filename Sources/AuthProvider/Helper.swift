@@ -11,7 +11,6 @@ public final class Helper {
     }
     
     internal func key<T>(for type: T.Type) -> String {
-        print(authAuthenticatedKey + "-\(T.self)")
         return authAuthenticatedKey + "-\(T.self)"
     }
 
