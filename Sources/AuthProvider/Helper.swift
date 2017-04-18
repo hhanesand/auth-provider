@@ -10,7 +10,8 @@ public final class Helper {
         self.request = request
     }
     
-    internal func key<T>(for type: T) -> String {
+    internal func key<T>(for type: T.Type) -> String {
+        print(authAuthenticatedKey + "-\(T.self)")
         return authAuthenticatedKey + "-\(T.self)"
     }
 
@@ -38,7 +39,7 @@ public final class Helper {
     ///
     /// `isAuthenticated` will return `true` for this type
     public func authenticate<A: Authenticatable>(_ a: A) {
-        request?.storage[key(for: a)] = a
+        request?.storage[key(for: A.self)] = a
     }
 
     /// Authenticates an `Authenticatable` and `Peristable` type
@@ -46,7 +47,7 @@ public final class Helper {
     ///
     /// Calls `.persist(for: req)` on the model.
     public func authenticate<AP: Authenticatable & Persistable>(_ ap: AP, persist: Bool) throws {
-        request?.storage[key(for: ap)] = ap
+        request?.storage[key(for: AP.self)] = ap
         if persist {
             guard let request = request else {
                 throw AuthError.noRequest
@@ -58,17 +59,17 @@ public final class Helper {
     /// Removes the authenticated user from internal storage.
     public func unauthenticate<A: Authenticatable>(_ a: A) throws {
         if
-            let user = request?.storage[key(for: a)] as? Persistable,
+            let user = request?.storage[key(for: A.self)] as? Persistable,
             let req = request
         {
             try user.unpersist(for: req)
         }
-        request?.storage[key(for: a)] = nil
+        request?.storage[key(for: A.self)] = nil
     }
 
     /// Returns the Authenticated user if it exists.
     public func authenticated<A: Authenticatable>(_ userType: A.Type = A.self) -> A? {
-        return request?.storage[key(for: userType)] as? A
+        return request?.storage[key(for: A.self)] as? A
     }
     
     /// Returns the Authenticated user or throws if it does not exist.
