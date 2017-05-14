@@ -19,7 +19,7 @@ extension SessionPersistable where Self: Entity {
     }
     
     public func unpersist(for req: Request) throws {
-        try req.assertSession().data.set(sessionEntityId + "-\(Self.self)", nil)
+        try req.assertSession().data.removeKey(sessionEntityId + "-\(Self.self)")
     }
     
     public static func fetchPersisted(for request: Request) throws -> Self? {
